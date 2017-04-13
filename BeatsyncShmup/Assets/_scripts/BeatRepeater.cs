@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Initial test of beat synchonization, using only time
@@ -9,34 +10,43 @@ public class BeatRepeater : MonoBehaviour {
 
     public float bpm;
     public AudioClip song;
-    AudioSource source;
+    public AudioSource source;
     float nextBeat;
     float samplesPerBeat;
+    double dspTimeStart;
 
-	// Use this for initialization
-	void Start () {
-        source = GetComponent<AudioSource>();
+    public UnityEvent OnBeat;
+
+    float previousSample;
+
+    // Use this for initialization
+    void Start () {
         source.clip = song;
         source.Play();
 
+
         samplesPerBeat = song.frequency / (bpm / 60);
+        dspTimeStart = AudioSettings.dspTime;
+        nextBeat = 0f;
         CalculateBeat();
+        Debug.Log(nextBeat);
     }
 	
 	// Update is called once per frame
 	void Update () {
-		if(source.timeSamples >= nextBeat)
-        {
-            //Debug.Log("beat");
-            //CalculateBeat();
-        }
+        //float CurrentTime = source.timeSamples;
+        float CurrentTime = (float)(AudioSettings.dspTime - dspTimeStart ) * source.clip.frequency;
 
-        Debug.Log("dspTime: " + (float)(AudioSettings.dspTime));
-        Debug.Log("TS: " + source.timeSamples);
+
+        if ((CurrentTime) >= nextBeat)
+        {
+            OnBeat.Invoke();
+            CalculateBeat();
+        }
     }
 
     void CalculateBeat()
     {
-        nextBeat = source.timeSamples + samplesPerBeat;
+        nextBeat = nextBeat + samplesPerBeat;
     }
 }
