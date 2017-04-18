@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class BeatRepeater : MonoBehaviour {
 
     public float bpm;
+    public float division = 1;
     public AudioClip song;
     public AudioSource source;
     float nextBeat;
@@ -25,7 +26,7 @@ public class BeatRepeater : MonoBehaviour {
         source.Play();
 
 
-        samplesPerBeat = song.frequency / (bpm / 60);
+        samplesPerBeat = song.frequency / (bpm / 60) / division;
         dspTimeStart = AudioSettings.dspTime;
         nextBeat = 0f;
         CalculateBeat();
