@@ -10,44 +10,63 @@ public class BeatRepeater : MonoBehaviour {
 
     public float bpm;
     public float division = 1;
-    public AudioClip song;
-    public AudioSource source;
-    float nextBeat;
-    float samplesPerBeat;
-    double dspTimeStart;
+    public int frequency = 44100;
+    public int sampleOffset = 0;
+    double nextBeat;
+    double samplesPerBeat;
+    double startBeatTime;
+    double lastBeatTime;
+    double CurrentTime;
 
     public UnityEvent OnBeat;
 
     float previousSample;
 
+    public double NextBeat
+    {
+        get
+        {
+            return nextBeat;
+        }
+    }
+
     // Use this for initialization
     void Start () {
-        source.clip = song;
-        source.Play();
 
-
-        samplesPerBeat = song.frequency / (bpm / 60) / division;
-        dspTimeStart = AudioSettings.dspTime;
-        nextBeat = 0f;
-        CalculateBeat();
-        Debug.Log(nextBeat);
+        samplesPerBeat = frequency / (bpm / 60) / division;
+        nextBeat = startBeatTime = ((AudioSettings.dspTime - AudioManager.instance.DspStartTime) * frequency);
     }
-	
-	// Update is called once per frame
-	void Update () {
-        //float CurrentTime = source.timeSamples;
-        float CurrentTime = (float)(AudioSettings.dspTime - dspTimeStart ) * source.clip.frequency;
 
+    private void OnEnable()
+    {
+        nextBeat = double.MaxValue;
+    }
 
-        if ((CurrentTime) >= nextBeat)
+    // Update is called once per frame
+    void Update () {
+        CurrentTime = ((AudioSettings.dspTime - AudioManager.instance.DspStartTime) * frequency);
+
+        if (CurrentTime >= AudioManager.instance.DspStartTime)
         {
-            OnBeat.Invoke();
+
+            if (CurrentTime >= nextBeat)
+            {
+                OnBeat.Invoke();
+
+            }
+
             CalculateBeat();
         }
     }
 
     void CalculateBeat()
     {
-        nextBeat = nextBeat + samplesPerBeat;
+        double newNextBeat = startBeatTime - sampleOffset;
+
+        while(newNextBeat < CurrentTime)
+        {
+            newNextBeat += samplesPerBeat;
+        }
+        nextBeat = newNextBeat;
     }
 }

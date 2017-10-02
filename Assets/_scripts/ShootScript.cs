@@ -6,13 +6,43 @@ public class ShootScript : MonoBehaviour {
 
     public GameObject bulletPrefab;
     public Transform spawnLocation;
-    public AudioSource audioSource;
+    GameObject[] pooledBullets;
+    public int poolLength;
 
-    bool canFire;
+    bool canFire = false;
+    public bool isFiring = false;
 
     private void Start()
     {
+        // Create bullet object pool
+        pooledBullets = new GameObject[poolLength];
+
+        for (int i = 0; i < pooledBullets.Length; i++)
+        {
+            GameObject obj = (GameObject)Instantiate(bulletPrefab);
+            obj.SetActive(false);
+            pooledBullets[i] = obj;
+        }
+    }
+
+    void ResetBullets()
+    {
+        for (int i = 0; i < pooledBullets.Length; i++)
+        {
+            pooledBullets[i].SetActive(false);
+        }
+    }
+
+    private void OnEnable()
+    {
         canFire = false;
+        isFiring = false;
+    }
+
+    private void OnDisable()
+    {
+        canFire = false;
+        isFiring = false;
     }
 
     public void OnBeat()
@@ -25,13 +55,29 @@ public class ShootScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        if(Input.GetButton("Fire1"))
+            isFiring = true;
+        else
+            isFiring = false;
+
         if(canFire && Input.GetButton("Fire1"))
         {
-            Object.Instantiate(bulletPrefab, spawnLocation.position, spawnLocation.rotation , null);
-            audioSource.Play();
+            bool activebullet = false;
+            int iterator = 0;
+            while(activebullet == false)
+            {
+                if(pooledBullets[iterator].activeInHierarchy == false)
+                {
+                    pooledBullets[iterator].SetActive(true);
+                    pooledBullets[iterator].GetComponent<BulletMovement>().Fire(spawnLocation);
+                    activebullet = true;
+                }
+                else
+                {
+                    iterator += 1;
+                }
+            }
         }
-
-        if (canFire)
-            canFire = false;
+        canFire = false;
 	}
 }

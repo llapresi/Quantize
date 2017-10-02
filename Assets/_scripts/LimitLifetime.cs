@@ -4,21 +4,8 @@ using UnityEngine;
 
 public class LimitLifetime : MonoBehaviour {
 
-    public float lifetimeSeconds;
-    private float initializationTime;
-
-    private void Start()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        initializationTime = Time.timeSinceLevelLoad;
-    } 
-
-    // Update is called once per frame
-    void Update () {
-        float timeSinceInitialization = Time.timeSinceLevelLoad - initializationTime;
-        
-        if(timeSinceInitialization > lifetimeSeconds)
-        {
-            Destroy(this.gameObject);
-        }
-	}
+        Destroy(this.gameObject);
+    }
 }

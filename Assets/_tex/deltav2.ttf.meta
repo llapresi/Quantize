@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 900fe2ad5140da648a18ed805f4488aa
+timeCreated: 1506846134
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Delta Ray
+  fontNames:
+  - Delta Ray
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

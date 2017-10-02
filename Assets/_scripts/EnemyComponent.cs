@@ -4,43 +4,150 @@ using System.Collections;
 // Moves enemy when seen by player
 public class EnemyComponent : MonoBehaviour
 {
-    public delegate void Death();
-    public Death OnKill;
-
     public float speed;
-
-    bool canMove = true;
+    public float healthAmount = 15.0f;
+    public float mercyTime = 100;
 
     Rigidbody2D myRB;
     GameObject playerRef;
+    EnemySpawner spawner;
+    Renderer rend;
 
-    void Awake()
-    {
-        OnKill = DefaultDeath;
-    }
+    public GameManager.HealthCategory enemyType;
+    bool hasSetColor;
 
     void Start()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player");
+        playerRef = GameManager.instance.PlayerRef;
         myRB = GetComponent<Rigidbody2D>();
+        rend = GetComponent<Renderer>();
+        spawner = GameObject.Find("EnemySpawner").GetComponent<EnemySpawner>();
+        rend.material.color = new Color(.9f, .9f, .9f);
+        hasSetColor = false;
+        myRB.isKinematic = true;
+        this.gameObject.tag = "Mercy";
+    }
+
+    public void SetEnemyType(GameManager.HealthCategory enemyType)
+    {
+        this.enemyType = enemyType;
+        if (this.enemyType == GameManager.HealthCategory.Kick)
+        {
+            healthAmount = 35;
+            speed = 2;
+            speed = -speed;
+        }
+        else if (this.enemyType == GameManager.HealthCategory.Hats)
+        {
+            speed *= 2f;
+        }
+        else if (this.enemyType == GameManager.HealthCategory.Bass)
+        {
+            // Maybe Do stuff here?
+        }
+    }
+
+    void SetEnemyColor()
+    {
+        if (this.enemyType == GameManager.HealthCategory.Kick)
+        {
+            rend.material.color = new Color(0, 0.69f, 0.87f);
+        }
+        else if (this.enemyType == GameManager.HealthCategory.Hats)
+        {
+            rend.material.color = new Color(0.24f, 0.87f, 0);
+        }
+        else if (this.enemyType == GameManager.HealthCategory.Bass)
+        {
+            rend.material.color = new Color(0.87f, 0.77f, 0);
+        }
     }
 
     void FixedUpdate()
     {
-        if (canMove)
+        if (mercyTime <= 0)
         {
             float step = speed * Time.fixedDeltaTime;
             Vector3 nF3 = Vector3.MoveTowards(transform.position, playerRef.transform.position, step);
             Vector2 nextFrame = new Vector2(nF3.x, nF3.y);
             myRB.MovePosition(nextFrame);
+        }
 
-            //myRB.velocity = (new Vector2(playerRef.transform.position.x,
-            //  playerRef.transform.position.y) - myRB.position) * speed * Time.fixedDeltaTime;
+        //myRB.velocity = (new Vector2(playerRef.transform.position.x,
+        //  playerRef.transform.position.y) - myRB.position) * speed * Time.fixedDeltaTime;
+
+        if (myRB.transform.position.y < -13 || myRB.transform.position.y > 13 || myRB.transform.position.x < -19 || myRB.transform.position.x > 19)
+        {
+            spawner.RemoveEnemy(this.gameObject);
+            Destroy(this.gameObject);
         }
     }
 
-    void DefaultDeath()
+    void Update()
     {
-        Debug.Log("died");
+        if(mercyTime > 0)
+        {
+            mercyTime -= (Time.deltaTime * 2);
+        }
+        else
+        {
+            mercyTime = 0;
+            if(hasSetColor == false)
+            {
+                SetEnemyColor();
+                hasSetColor = true;
+                myRB.isKinematic = false;
+                this.gameObject.tag = "Enemy";
+            }
+        }
+    }
+
+    public void Kill(bool scores)
+    {
+        if(scores)
+        {
+            if (enemyType == GameManager.HealthCategory.Kick)
+            {
+                GameManager.instance.AddScore(15);
+            }
+            if (enemyType == GameManager.HealthCategory.Hats)
+            {
+                GameManager.instance.AddScore(10);
+            }
+            if (enemyType == GameManager.HealthCategory.Bass)
+            {
+                GameManager.instance.AddScore(7);
+            }
+            GameManager.instance.ChangeHealth(enemyType, healthAmount);
+            SFXManager.instance.PlayKillSound(enemyType);
+        }
+
+        spawner.RemoveEnemy(this.gameObject);
+        Destroy(this.gameObject);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (mercyTime <= 0)
+        {
+            if (collision.collider.gameObject.tag == "Bullet")
+            {
+                if (collision.collider.gameObject.GetComponent<BulletMovement>().bulletCategory == enemyType)
+                {
+                    Kill(true);
+                }
+            }
+
+            if (collision.collider.gameObject.tag == "Player" && GameManager.instance.PlayerRef.GetComponent<PlayerMovemet>().IsDashing())
+            {
+                Kill(false);
+            }
+
+            // Kicks ignore collision with walls
+            if (collision.gameObject.tag == "Wall" && enemyType == GameManager.HealthCategory.Kick)
+            {
+                Physics2D.IgnoreCollision(this.GetComponent<Collider2D>(), collision.collider);
+            }
+        }
     }
 }
