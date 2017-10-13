@@ -67,18 +67,9 @@ public class AudioManager : MonoBehaviour {
 
     private void Start()
     {
-        /*coroutine = SyncSources();
-        StartCoroutine(coroutine);
-
-        AudioManager.instance.masterMixer.SetFloat("bassVolume", -90.0f);
-        AudioManager.instance.masterMixer.SetFloat("chordsVolume", -90.0f);
-        AudioManager.instance.masterMixer.SetFloat("hatsVolume", -90.0f);
-        AudioManager.instance.masterMixer.SetFloat("kickVolume", 0.0f); */
-
         for (int i = 0; i < sources.Length; i++)
         {
-            sources[i].PlayScheduled(dspStartTime);
-            Debug.Log(dspStartTime);
+            sources[i].PlayScheduled(DspStartTime);
         }
     }
 

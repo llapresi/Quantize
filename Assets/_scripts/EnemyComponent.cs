@@ -11,18 +11,21 @@ public class EnemyComponent : MonoBehaviour
     Rigidbody2D myRB;
     GameObject playerRef;
     EnemySpawner spawner;
-    Renderer rend;
+    public SpriteRenderer rend;
 
     public GameManager.HealthCategory enemyType;
     bool hasSetColor;
 
-    void Start()
+    void Awake()
     {
         playerRef = GameManager.instance.PlayerRef;
         myRB = GetComponent<Rigidbody2D>();
-        rend = GetComponent<Renderer>();
         spawner = GameObject.Find("EnemySpawner").GetComponent<EnemySpawner>();
-        rend.material.color = new Color(.9f, .9f, .9f);
+    }
+
+    private void OnEnable()
+    {
+        rend.color = new Color(.9f, .9f, .9f);
         hasSetColor = false;
         myRB.isKinematic = true;
         this.gameObject.tag = "Mercy";
@@ -51,15 +54,15 @@ public class EnemyComponent : MonoBehaviour
     {
         if (this.enemyType == GameManager.HealthCategory.Kick)
         {
-            rend.material.color = new Color(0, 0.69f, 0.87f);
+            rend.color = new Color(0, 0.69f, 0.87f);
         }
         else if (this.enemyType == GameManager.HealthCategory.Hats)
         {
-            rend.material.color = new Color(0.24f, 0.87f, 0);
+            rend.color = new Color(0.24f, 0.87f, 0);
         }
         else if (this.enemyType == GameManager.HealthCategory.Bass)
         {
-            rend.material.color = new Color(0.87f, 0.77f, 0);
+            rend.color = new Color(0.87f, 0.77f, 0);
         }
     }
 

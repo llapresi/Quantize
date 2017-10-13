@@ -25,17 +25,17 @@ public class SFXManager : MonoBehaviour {
     {
         if(type == GameManager.HealthCategory.Hats)
         {
-            hatKill.QueueSound();
+            hatKill.PlaySound();
         }
 
         if (type == GameManager.HealthCategory.Kick)
         {
-            kickKill.QueueSound();
+            kickKill.PlaySound();
         }
 
         if (type == GameManager.HealthCategory.Bass)
         {
-            bassKill.QueueSound();
+            bassKill.PlaySound();
         }
     }
 }

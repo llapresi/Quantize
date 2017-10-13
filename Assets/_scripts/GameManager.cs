@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
     private float kickHealth, bassHealth, hatsHealth, decayAmount = 0.5f, healthCap;
 
     GameObject playerRef;
+    public UnityEngine.PostProcessing.PostProcessingBehaviour cameraPP;
 
     public int PlayerLives = 3;
     int score = 0;
@@ -38,6 +39,18 @@ public class GameManager : MonoBehaviour {
         get
         {
             return playerRef;
+        }
+    }
+
+    public void Start()
+    {
+        if(QualitySettings.GetQualityLevel() == 1)
+        {
+            cameraPP.enabled = true;
+        }
+        else
+        {
+            cameraPP.enabled = false;
         }
     }
 

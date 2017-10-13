@@ -24,7 +24,7 @@ public class EnemySpawner : MonoBehaviour {
 
     public void SpawnWave()
     {
-        // spawn kick enemies
+        // spawn new kick enemies
         for(int i = 0; i < Mathf.RoundToInt(startWave / 3); i++)
         {
             // Limit the kick to only spawn in the inner 60% of the normal spawn radius
@@ -33,6 +33,7 @@ public class EnemySpawner : MonoBehaviour {
             activeEnemies.Add(kEnemy);
         }
 
+        // spawn new non-kick enemies
         for (int i = 0; i < Mathf.RoundToInt((2*startWave)/ 3); i++)
         {
             GameObject bEnemy = (GameObject)Instantiate(enemyPrefab, new Vector3(Random.Range(-randomSpawnRangeX, randomSpawnRangeX), Random.Range(-randomSpawnRangeY, randomSpawnRangeY), 0), Quaternion.identity);
@@ -45,7 +46,7 @@ public class EnemySpawner : MonoBehaviour {
         }
 
         startWave = Mathf.Pow(startWave, exponent);
-        Debug.Log(startWave);
+        //Debug.Log(startWave);
     }
 
     public void RemoveEnemy(GameObject enemy)

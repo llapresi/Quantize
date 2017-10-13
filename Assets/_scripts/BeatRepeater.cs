@@ -14,9 +14,11 @@ public class BeatRepeater : MonoBehaviour {
     public int sampleOffset = 0;
     double nextBeat;
     double samplesPerBeat;
+    double secondsPerBeat;
     double startBeatTime;
     double lastBeatTime;
     double CurrentTime;
+    public bool renderDebug = false;
 
     public UnityEvent OnBeat;
 
@@ -33,18 +35,19 @@ public class BeatRepeater : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
-        samplesPerBeat = frequency / (bpm / 60) / division;
-        nextBeat = startBeatTime = ((AudioSettings.dspTime - AudioManager.instance.DspStartTime) * frequency);
+        secondsPerBeat = (60 / bpm) / division;
+        nextBeat = startBeatTime = (AudioManager.instance.DspStartTime);
     }
 
+    // Fixes bug where beats "play catch up" after a repeater has been deactivated and then reactivated (ex. the weapons)
     private void OnEnable()
     {
-        nextBeat = double.MaxValue;
+        nextBeat = double.MinValue;
     }
 
     // Update is called once per frame
     void Update () {
-        CurrentTime = ((AudioSettings.dspTime - AudioManager.instance.DspStartTime) * frequency);
+        CurrentTime = (AudioSettings.dspTime);
 
         if (CurrentTime >= AudioManager.instance.DspStartTime)
         {
@@ -61,11 +64,11 @@ public class BeatRepeater : MonoBehaviour {
 
     void CalculateBeat()
     {
-        double newNextBeat = startBeatTime - sampleOffset;
+        double newNextBeat = startBeatTime;
 
         while(newNextBeat < CurrentTime)
         {
-            newNextBeat += samplesPerBeat;
+            newNextBeat += secondsPerBeat;
         }
         nextBeat = newNextBeat;
     }
