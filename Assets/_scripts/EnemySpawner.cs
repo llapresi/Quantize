@@ -5,7 +5,9 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour {
 
     public GameObject enemyPrefab;
-    static public List<GameObject> activeEnemies; 
+    static public List<GameObject> activeEnemies;
+    // used to fetch enemy types. mainly an autoaim optimization
+    static public List<GameManager.HealthCategory> activeEnemyTypes;
 
     [SerializeField]
     private float startWave = 3.0f;
@@ -20,6 +22,7 @@ public class EnemySpawner : MonoBehaviour {
     private void Start()
     {
         activeEnemies = new List<GameObject>();
+        activeEnemyTypes = new List<GameManager.HealthCategory>();
     }
 
     public void SpawnWave()
@@ -31,6 +34,7 @@ public class EnemySpawner : MonoBehaviour {
             GameObject kEnemy = (GameObject)Instantiate(enemyPrefab, new Vector3(Random.Range(-randomSpawnRangeX * 0.6f, randomSpawnRangeX) * 0.6f, Random.Range(-randomSpawnRangeY * 0.6f, randomSpawnRangeY * 0.6f), 0), Quaternion.identity);
             kEnemy.GetComponent<EnemyComponent>().SetEnemyType(GameManager.HealthCategory.Kick);
             activeEnemies.Add(kEnemy);
+            activeEnemyTypes.Add(GameManager.HealthCategory.Kick);
         }
 
         // spawn new non-kick enemies
@@ -39,10 +43,13 @@ public class EnemySpawner : MonoBehaviour {
             GameObject bEnemy = (GameObject)Instantiate(enemyPrefab, new Vector3(Random.Range(-randomSpawnRangeX, randomSpawnRangeX), Random.Range(-randomSpawnRangeY, randomSpawnRangeY), 0), Quaternion.identity);
             bEnemy.GetComponent<EnemyComponent>().SetEnemyType(GameManager.HealthCategory.Bass);
             activeEnemies.Add(bEnemy);
+            activeEnemyTypes.Add(GameManager.HealthCategory.Bass);
+
 
             GameObject hEnemy = (GameObject)Instantiate(enemyPrefab, new Vector3(Random.Range(-randomSpawnRangeX, randomSpawnRangeX), Random.Range(-randomSpawnRangeY, randomSpawnRangeY), 0), Quaternion.identity);
             hEnemy.GetComponent<EnemyComponent>().SetEnemyType(GameManager.HealthCategory.Hats);
             activeEnemies.Add(hEnemy);
+            activeEnemyTypes.Add(GameManager.HealthCategory.Hats);
         }
 
         startWave = Mathf.Pow(startWave, exponent);
@@ -51,6 +58,8 @@ public class EnemySpawner : MonoBehaviour {
 
     public void RemoveEnemy(GameObject enemy)
     {
+        int position = activeEnemies.IndexOf(enemy);
         activeEnemies.Remove(enemy);
+        activeEnemyTypes.RemoveAt(position);
     }
 }

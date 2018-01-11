@@ -55,12 +55,16 @@ public class ShootScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        if(Input.GetButton("Fire1"))
+        Vector2 rightStick = Vector2.zero;
+        rightStick.x = Input.GetAxisRaw("Right Joystick X");
+        rightStick.y = Input.GetAxisRaw("Right Joystick Y");
+
+        if (Input.GetButton("Fire1") || rightStick.magnitude > 0.3f)
             isFiring = true;
         else
             isFiring = false;
 
-        if(canFire && Input.GetButton("Fire1"))
+        if(canFire && (Input.GetButton("Fire1") || rightStick.magnitude > 0.3f))
         {
             bool activebullet = false;
             int iterator = 0;
